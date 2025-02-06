@@ -13,6 +13,7 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
     const [infants, setInfants] = useState(0);
     const [dateFrom, setDateFrom] = useState<Date | undefined>(new Date());
     const [dateTo, setDateTo] = useState<Date | undefined>();
+    const [searchResults, setSearchResults] = useState([]);
 
     return (
         <SearchContext.Provider
@@ -39,6 +40,8 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
                 setDateFrom,
                 dateTo,
                 setDateTo,
+                searchResults,
+                setSearchResults
             }}
         >
             {children}

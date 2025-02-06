@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router";
 import { ArrowRightLeft, Search } from "lucide-react";
 
 import {
@@ -17,10 +18,10 @@ import CalendarSelect from "./calendar-select";
 import { useState } from "react";
 
 const SearchCard = () => {
-    const { adults, kids, infants, cabinClass, direction, originSkyId, originEntityId, destinationSkyId, destinationEntityId, dateFrom, dateTo } = useSearch();
+    const navigate = useNavigate();
+    const { adults, kids, infants, cabinClass, direction, originSkyId, originEntityId, destinationSkyId, destinationEntityId, dateFrom, dateTo, setSearchResults } = useSearch();
 
     const [loading, setLoading] = useState(false);
-    const [results, setResults] = useState();
 
 
 
@@ -46,7 +47,8 @@ const SearchCard = () => {
             console.table("RESULTS: ", json)
 
             if (json && json.data) {
-                setResults(json.data);
+                setSearchResults(json.data);
+                navigate("/flight-results");
             }
         } catch (error: unknown) {
             if (error instanceof Error && error.name !== "AbortError") {

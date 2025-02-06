@@ -23,6 +23,8 @@ interface SearchContextProps {
   setDateTo: (date: Date | undefined) => void;
   dateFrom: Date | undefined;
   setDateFrom: (date: Date | undefined) => void;
+  searchResults: [];
+  setSearchResults: (results: []) => void;
 }
 
 export const SearchContext = createContext<SearchContextProps | undefined>(
