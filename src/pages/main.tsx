@@ -16,9 +16,9 @@ const Main = () => {
                 <div className="text-center text-6xl -mt-20">
                     Flights
                 </div>
-                <div className='w-3/4 mx-auto mt-20'>
+                <div className='flex flex-col items-center justify-center'>
                     <SearchCard />
-                    <div className="flex text-xl font-semibold mt-10 items-center gap-2">
+                    {/* <div className="flex text-xl font-semibold mt-10 items-center gap-2">
                         <div>
                             Find cheap flights from Tel Aviv-Yafo to anywhere
                         </div>
@@ -31,8 +31,10 @@ const Main = () => {
                                 {city}
                             </div>
                         ))}
+                    </div> */}
+                    <div className="w-full rounded-xl md:rounded-2xl p-4 mt-10 md:p-0 md:w-[736px] lg:w-[982px] overflow-hidden">
+                        <img src={map} className="w-full block" alt="Map background" />
                     </div>
-                    <img src={map} className='text-center mt-4 rounded-2xl' alt="Map background" />
                 </div>
             </div>
         </main >

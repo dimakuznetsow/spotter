@@ -9,20 +9,25 @@ import {
 import { Calendar } from "@/components/ui/calendar"
 import { CalendarDaysIcon } from "lucide-react";
 
+interface CalendarSelectProps {
+    marginLeft?: string;
+    buttonWidth?: string;
+    buttonHeight?: string;
+}
 
-const CalendarSelect: React.FC = () => {
+const CalendarSelect: React.FC<CalendarSelectProps> = ({ marginLeft, buttonWidth, buttonHeight }) => {
     const { direction, dateTo, dateFrom, setDateFrom, setDateTo } = useSearch();
 
     const handleDateFormat = (date: Date | undefined) => date?.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
 
 
     return (
-        <div className="flex gap-2 mb-6">
+        <div className={`flex ${marginLeft} ${buttonWidth} ${buttonHeight}`}>
             <Popover >
                 <PopoverTrigger asChild>
                     <Button
                         variant="outline"
-                        className="relative w-110 h-13 rounded-sm border-gray-300 text-base flex justify-between"
+                        className="relative w-full h-full rounded-sm border-gray-300 text-lg flex justify-between"
                     >
                         <CalendarDaysIcon className="absolute left-2" size={20} />
                         <span className="ml-5">

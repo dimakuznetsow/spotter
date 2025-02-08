@@ -32,7 +32,7 @@ const DirectionSelect: React.FC = () => {
 
     return (
         <Select defaultValue={direction} onValueChange={(value: string) => setDirection(value)}>
-            <SelectTrigger className="w-[180px] flex items-center border-transparent shadow-none focus:ring-0">
+            <SelectTrigger className="w-[180px] border-none flex items-center shadow-none focus:ring-0">
                 {IconComponent && <IconComponent className="h-4 w-4" />}
                 <SelectValue placeholder={direction} />
             </SelectTrigger>

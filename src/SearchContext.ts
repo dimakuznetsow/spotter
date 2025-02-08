@@ -3,8 +3,12 @@ import { createContext } from "react";
 interface SearchContextProps {
   originSkyId: string;
   setOriginSkyId: (id: string) => void;
+  originSearch: string;
+  setOriginSearch: (search: string) => void;
   destinationSkyId: string;
   setDestinationSkyId: (id: string) => void;
+  destinationSearch: string;
+  setDestinationSearch: (search: string) => void;
   originEntityId: string;
   setOriginEntityId: (id: string) => void;
   destinationEntityId: string;

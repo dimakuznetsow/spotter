@@ -1,11 +1,15 @@
 import { useState, ReactNode } from "react";
 import { SearchContext } from "./SearchContext";
 
+
+
 export const SearchProvider = ({ children }: { children: ReactNode }) => {
     const [originSkyId, setOriginSkyId] = useState("");
-    const [destinationSkyId, setDestinationSkyId] = useState("");
     const [originEntityId, setOriginEntityId] = useState("");
+    const [originSearch, setOriginSearch] = useState("");
+    const [destinationSkyId, setDestinationSkyId] = useState("");
     const [destinationEntityId, setDestinationEntityId] = useState("");
+    const [destinationSearch, setDestinationSearch] = useState("");
     const [cabinClass, setCabinClass] = useState("economy");
     const [direction, setDirection] = useState("roundtrip");
     const [adults, setAdults] = useState(1);
@@ -20,12 +24,16 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
             value={{
                 originSkyId,
                 setOriginSkyId,
-                destinationSkyId,
-                setDestinationSkyId,
                 originEntityId,
                 setOriginEntityId,
+                originSearch,
+                setOriginSearch,
+                destinationSkyId,
+                setDestinationSkyId,
                 destinationEntityId,
                 setDestinationEntityId,
+                destinationSearch,
+                setDestinationSearch,
                 cabinClass,
                 setCabinClass,
                 direction,

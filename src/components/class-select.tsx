@@ -13,14 +13,14 @@ const ClassSelect: React.FC = () => {
 
     const classOptions = [
         { value: "economy", label: "Economy" },
-        { value: "premium-economy", label: "Premium economy" },
+        { value: "premium_economy", label: "Premium economy" },
         { value: "business", label: "Business" },
         { value: "first", label: "First" },
     ];
 
     return (
-        <Select defaultValue={"economy"} onValueChange={(value: string) => setCabinClass(value)}>
-            <SelectTrigger className="w-[180px] flex items-center border-transparent shadow-none focus:ring-0">
+        <Select value={cabinClass} onValueChange={(value: string) => setCabinClass(value)}>
+            <SelectTrigger className="w-[180px] border-none flex items-center  shadow-none focus:ring-0">
                 <SelectValue placeholder={cabinClass} />
             </SelectTrigger>
             <SelectContent className="bg-white shadow-sm border-none">

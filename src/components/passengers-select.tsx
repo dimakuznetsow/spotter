@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import { useSearch } from "@/hooks/useSearch";
 
 const PassengersSelect: React.FC = () => {
-    const { setAdults, setKids, setInfants } = useSearch();
+    const { setAdults, setKids, setInfants, } = useSearch();
 
     const [committedCounts, setCommittedCounts] = useState({
         adults: 1,
@@ -77,7 +77,7 @@ const PassengersSelect: React.FC = () => {
         <div>
             <Popover open={cardOpen} onOpenChange={handlePopoverOpenChange}>
                 <PopoverTrigger asChild>
-                    <Button variant="ghost" className="font-normal">
+                    <Button variant="ghost" className="font-normal border-none">
                         <User className="h-4 w-4 text-gray-500" />
                         {totalCommitted}
                     </Button>
