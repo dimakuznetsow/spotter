@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import { useSearch } from "@/hooks/useSearch";
 
 const PassengersSelect: React.FC = () => {
-    const { setAdults, setKids, setInfants, } = useSearch();
+    const { setAdults, setKids, setInfants, totalPassengers, setTotalPassengers } = useSearch();
 
     const [committedCounts, setCommittedCounts] = useState({
         adults: 1,
@@ -13,15 +13,10 @@ const PassengersSelect: React.FC = () => {
         infantsInSeat: 0,
         infantsOnLap: 0,
     });
+
     const [editingCounts, setEditingCounts] = useState({ ...committedCounts });
     const [cardOpen, setCardOpen] = useState(false);
     const [cancelled, setCancelled] = useState(false);
-
-    const totalCommitted =
-        committedCounts.adults +
-        committedCounts.children +
-        committedCounts.infantsInSeat +
-        committedCounts.infantsOnLap;
 
     const totalEditing =
         editingCounts.adults +
@@ -31,25 +26,24 @@ const PassengersSelect: React.FC = () => {
 
     const canAddPassenger = totalEditing < 10;
 
-    // Handler for when the popover open state changes.
-    // When opening, copy committedCounts to editingCounts.
-    // When closing, if the user did not cancel, commit the editingCounts.
+
     const handlePopoverOpenChange = (open: boolean) => {
         if (open) {
             setEditingCounts({ ...committedCounts });
+            setTotalPassengers(committedCounts.adults + committedCounts.children + committedCounts.infantsInSeat + committedCounts.infantsOnLap);
             setAdults(committedCounts.adults);
             setKids(committedCounts.children + committedCounts.infantsInSeat);
             setInfants(committedCounts.infantsOnLap);
             setCancelled(false);
             setCardOpen(true);
         } else {
-            // If the user did NOT cancel, then update the committed values
             if (!cancelled) {
                 if (canAddPassenger) {
                     setCommittedCounts({ ...editingCounts });
                     setAdults(editingCounts.adults);
                     setKids(editingCounts.children + editingCounts.infantsInSeat);
                     setInfants(editingCounts.infantsOnLap);
+                    setTotalPassengers(editingCounts.adults + editingCounts.children + editingCounts.infantsInSeat + editingCounts.infantsOnLap);
                 }
 
             }
@@ -57,19 +51,18 @@ const PassengersSelect: React.FC = () => {
         }
     };
 
-    // Cancel button: mark as cancelled and close the popover.
     const handleCancel = () => {
         setCancelled(true);
         setCardOpen(false);
     };
 
-    // Done button: commit changes and close the popover.
     const handleDone = () => {
         setCancelled(false);
         setCommittedCounts({ ...editingCounts });
         setAdults(editingCounts.adults);
         setKids(editingCounts.children + editingCounts.infantsInSeat);
         setInfants(editingCounts.infantsOnLap);
+        setTotalPassengers(editingCounts.adults + editingCounts.children + editingCounts.infantsInSeat + editingCounts.infantsOnLap);
         setCardOpen(false);
     };
 
@@ -79,7 +72,7 @@ const PassengersSelect: React.FC = () => {
                 <PopoverTrigger asChild>
                     <Button variant="ghost" className="font-normal border-none">
                         <User className="h-4 w-4 text-gray-500" />
-                        {totalCommitted}
+                        {totalPassengers}
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent

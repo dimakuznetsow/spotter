@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router"
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { MenuIcon, MoonIcon, Grip } from "lucide-react"
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
+import { useSearch } from "@/hooks/useSearch"
 import google from '../assets/google.svg'
 import icon1 from '../assets/header-icon1.svg'
 import icon2 from '../assets/header-icon2.svg'
@@ -22,8 +23,9 @@ const items = [
 const Header = () => {
 
     const navigate = useNavigate()
+    const { loading } = useSearch()
     return (
-        <div className="h-16 w-screen px-6 py-4 flex items-center justify-between bg-white border-b border-gray-300">
+        <div className="relative h-16 w-screen px-6 py-4 flex items-center justify-between bg-white border-b border-gray-300">
             <div className="flex gap-4 items-center ">
                 <MenuIcon size={24} className="block" />
                 <img onClick={() => navigate('/')} src={google} alt="google" className="block mt-1" />
@@ -49,6 +51,9 @@ const Header = () => {
                     <AvatarFallback>DK</AvatarFallback>
                 </Avatar>
             </div>
+            {loading && (
+                <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-400 animate-pulse"></div>
+            )}
 
         </div>
     )

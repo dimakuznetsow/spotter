@@ -1,7 +1,8 @@
+import { ChevronDown, MoveRight } from "lucide-react";
 
+import { Itinerary, Segment } from "@/lib/types";
 import { useSearch } from "@/hooks/useSearch";
 import { Card } from "@/components/ui/card";
-import { ChevronDown, MoveRight } from "lucide-react";
 
 
 const SearchResults: React.FC = () => {
@@ -17,16 +18,14 @@ const SearchResults: React.FC = () => {
 
     return (
         <>
-            {searchResults?.itineraries?.map((flight: any, index: number) => {
-                // Check if operating carrier exists; otherwise, use marketing
+            {searchResults?.itineraries?.map((flight: Itinerary, index: number) => {
                 const carriers = flight.legs[0]?.carriers;
-                const carrier =
-                    carriers && carriers.operating?.length > 2
-                        ? carriers.operating[0]
-                        : carriers?.marketing?.[0];
+                const carrier = (carriers?.operating ?? []).length > 2
+                    ? carriers?.operating?.[0]
+                    : carriers?.marketing?.[0];
 
                 const totalDuration = flight.legs[0].segments.length > 1
-                    ? flight.legs[0].segments.reduce((total: number, segment: any) => total + segment.durationInMinutes, 0)
+                    ? flight.legs[0].segments.reduce((total: number, segment: Segment) => total + segment.durationInMinutes, 0)
                     : flight.legs[0].segments[0].durationInMinutes;
 
 
@@ -96,8 +95,13 @@ const SearchResults: React.FC = () => {
                                             +{Math.floor(Math.random() * (29 - 10 + 1)) + 10}% emissions
                                         </div>
                                     </div>
-                                    <div className="w-21 lg:w-32 ml-4 text-center text-[#202124] text-base font-medium">
-                                        {flight.price.formatted}
+                                    <div className="flex-col ">
+                                        <div className="w-21 lg:w-32  text-center text-[#202124] text-base font-medium">
+                                            {flight.price.formatted}
+                                        </div>
+                                        <div className="text-[#70757a] text-center text-xs font-normal mt-1 flex-1">
+                                            {direction === "roundtrip" ? "round trip" : "\u00A0"}
+                                        </div>
                                     </div>
                                     <div className="ml-10 lg:ml-4 p-2 rounded-full hover:bg-[#70757a]/10">
                                         <ChevronDown className="h-6 w-6 text-[#70757a]" />
@@ -109,7 +113,7 @@ const SearchResults: React.FC = () => {
                                 {/* Mobile */}
                                 <div className="w-full flex flex-row justify-between md:hidden px-4">
                                     <div className="flex items-center">
-                                        <div className=" mr-5 place-self-start">
+                                        <div className=" mr-5 w-9 place-self-start">
                                             {carrier.logoUrl && (
                                                 <img
                                                     src={carrier.logoUrl}
@@ -152,7 +156,7 @@ const SearchResults: React.FC = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="flex gap-6 text-[#70757a] text-xs font-normal mt-1">
+                                            <div className="flex gap-6 text-[#70757a] text-xs font-normal mt-1 truncate" >
                                                 <div>
                                                     {flight.legs[0].stopCount > 1
                                                         ? flight.legs[0].stopCount + ' stops'
@@ -179,7 +183,7 @@ const SearchResults: React.FC = () => {
                                             <div className="text-[#70757a] text-xs font-normal mt-1 flex-1">
                                                 {direction === "roundtrip" ? "round trip" : "\u00A0"}
                                             </div>
-                                            <div className="text-[#70757a] text-xs font-normal mt-1">
+                                            <div className="text-[#70757a] text-xs font-normal mt-1 truncate">
                                                 +{Math.floor(Math.random() * (29 - 10 + 1)) + 10}% emissions
                                             </div>
                                         </div>

@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useNavigate } from "react-router";
 import { ArrowRightLeft, Search } from "lucide-react";
 
@@ -15,18 +16,16 @@ import DirectionSelect from "./direction-select";
 import OriginSelect from "./origin-select";
 import DestinationSelect from "./destination-select";
 import CalendarSelect from "./calendar-select";
-import { useState } from "react";
 
 const SearchCard = () => {
     const navigate = useNavigate();
-    const { adults, kids, infants, cabinClass, direction, originSkyId, originEntityId, destinationSkyId, destinationEntityId, dateFrom, dateTo, setSearchResults } = useSearch();
+    const { adults, kids, infants, cabinClass, originSkyId, setOriginSkyId, originEntityId, setOriginEntityId, destinationSkyId, setDestinationSkyId, destinationEntityId, setDestinationEntityId, dateFrom, dateTo, setSearchResults, originSearch, setOriginSearch, destinationSearch, setDestinationSearch, loading, setLoading } = useSearch();
 
-    const [loading, setLoading] = useState(false);
 
     console.log("DATE FROM: ", dateFrom)
     console.log("SEARCH CARD DATE TO: ", dateTo?.toISOString().split('T')[0])
 
-    const handleFetchResults = async () => {
+    const handleFetchResults = useCallback(async () => {
         const controller = new AbortController();
         setLoading(true);
 
@@ -60,6 +59,24 @@ const SearchCard = () => {
         } finally {
             setLoading(false);
         }
+    }, [adults, kids, infants, cabinClass, originSkyId, originEntityId, destinationSkyId, destinationEntityId, dateFrom, dateTo, setSearchResults, navigate, setLoading]);
+
+
+    const handleSwap = () => {
+        const tempOrigin = originSearch;
+        const tempDestination = destinationSearch;
+        const tempOriginSkyId = originSkyId;
+        const tempOriginEntityId = originEntityId;
+        const tempDestinationSkyId = destinationSkyId;
+        const tempDestinationEntityId = destinationEntityId;
+
+        setOriginSearch(tempDestination);
+        setOriginSkyId(tempDestinationSkyId);
+        setOriginEntityId(tempDestinationEntityId);
+
+        setDestinationSearch(tempOrigin);
+        setDestinationSkyId(tempOriginSkyId);
+        setDestinationEntityId(tempOriginEntityId);
     };
 
     // console.log("originSkyId: ", originSkyId)
@@ -92,10 +109,11 @@ const SearchCard = () => {
 
 
                     <Button
+                        onClick={handleSwap}
                         className="
                         absolute 
                         left-1/2 
-                        top-1/2 
+                        top-1/2     
                         transform 
                         -translate-x-1/2 
                         -translate-y-1/2 

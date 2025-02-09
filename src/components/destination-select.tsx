@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { MapPin } from "lucide-react";
 
+import { APIResponse, FlightData } from "@/lib/types";
 import { useSearch } from "@/hooks/useSearch";
 import {
     Command,
@@ -10,108 +11,69 @@ import {
     CommandList,
 } from "@/components/ui/command";
 
-interface Presentation {
-    title: string;
-    suggestionTitle: string;
-    subtitle: string;
-}
-
-interface RelevantFlightParams {
-    skyId: string;
-    entityId: string;
-    flightPlaceType: string;
-    localizedName: string;
-}
-
-interface RelevantHotelParams {
-    entityId: string;
-    entityType: string;
-    localizedName: string;
-}
-
-interface Navigation {
-    entityId: string;
-    entityType: "CITY" | "AIRPORT";
-    localizedName: string;
-    relevantFlightParams: RelevantFlightParams;
-    relevantHotelParams: RelevantHotelParams;
-}
-
-export interface FlightData {
-    skyId: string;
-    entityId: string;
-    presentation: Presentation;
-    navigation: Navigation;
-}
-
-interface APIResponse {
-    status: boolean;
-    timestamp: number;
-    data: FlightData[];
-}
-
 interface DestinationSelectProps {
     commandWidth?: string;
     commandHeight?: string;
 }
 
 const DestinationSelect: React.FC<DestinationSelectProps> = ({ commandWidth, commandHeight }) => {
-    const { setDestinationSkyId, setDestinationEntityId, setDestinationSearch, destinationSearch } = useSearch();
+    const { setDestinationSkyId, setDestinationEntityId, setDestinationSearch, destinationSearch, setLoading } = useSearch();
 
     const [resultsTo, setResultsTo] = useState<FlightData[]>([]);
-    const [loading, setLoading] = useState(false);
 
-    console.log("DESTINATION SEARCH: ", destinationSearch);
-
-
-    useEffect(() => {
+    const fetchResults = useCallback(async () => {
         const controller = new AbortController();
+
         if (!destinationSearch) {
             setResultsTo([]);
             return;
         }
 
-        const fetchResults = async () => {
-            setLoading(true);
-            try {
-                const response = await fetch(
-                    `https://sky-scrapper.p.rapidapi.com/api/v1/flights/searchAirport?query=${encodeURIComponent(
-                        destinationSearch
-                    )}&locale=en-US`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "X-RapidAPI-Key": import.meta.env.VITE_RAPID_API_KEY,
-                            "X-RapidAPI-Host": "sky-scrapper.p.rapidapi.com",
-                        },
-                        signal: controller.signal,
-                    }
-                );
-                const json: APIResponse = await response.json();
-                if (json && json.data) {
-                    setResultsTo(json.data);
+        setLoading(true);
+        try {
+            const response = await fetch(
+                `https://sky-scrapper.p.rapidapi.com/api/v1/flights/searchAirport?query=${encodeURIComponent(
+                    destinationSearch
+                )}&locale=en-US`,
+                {
+                    method: "GET",
+                    headers: {
+                        "X-RapidAPI-Key": import.meta.env.VITE_RAPID_API_KEY,
+                        "X-RapidAPI-Host": "sky-scrapper.p.rapidapi.com",
+                    },
+                    signal: controller.signal,
                 }
-            } catch (error: unknown) {
-                if (error instanceof Error && error.name !== "AbortError") {
-                    console.error("Fetch error:", error);
-                }
-            } finally {
-                setLoading(false);
+            );
+            const json: APIResponse = await response.json();
+            if (json && json.data) {
+                setResultsTo(json.data);
             }
-        };
+        } catch (error: unknown) {
+            if (error instanceof Error && error.name !== "AbortError") {
+                console.error("Fetch error:", error);
+            }
+        } finally {
+            setLoading(false);
+        }
+    }, [destinationSearch, setLoading, setResultsTo]);
 
+
+    useEffect(() => {
         fetchResults();
+        return () => { };
+    }, [fetchResults]);
 
-        return () => controller.abort();
-    }, [destinationSearch]);
 
+    const cityResultsTo = useMemo(() => {
+        return resultsTo.filter(item => item.navigation.entityType === "CITY");
+    }, [resultsTo]);
 
-    const cityResultsFrom = resultsTo.filter(
-        (item) => item.navigation.entityType === "CITY"
-    );
-    const airportResultsFrom = resultsTo.filter(
-        (item) => item.navigation.entityType === "AIRPORT"
-    );
+    const airportResultsTo = useMemo(() => {
+        return resultsTo.filter(
+            item => item.navigation.entityType === "AIRPORT"
+        );
+    }, [resultsTo]);
+
 
 
     return (
@@ -133,7 +95,7 @@ const DestinationSelect: React.FC<DestinationSelectProps> = ({ commandWidth, com
                     }`}
             >
                 <CommandList>
-                    {cityResultsFrom.map((city) => (
+                    {cityResultsTo.map((city) => (
                         <CommandItem
                             key={city.skyId}
                             value={city.presentation.title}
@@ -155,7 +117,7 @@ const DestinationSelect: React.FC<DestinationSelectProps> = ({ commandWidth, com
                     ))}
                 </CommandList>
                 <CommandList>
-                    {airportResultsFrom.filter((airport) => airport.skyId.length < 4).map((airport) => (
+                    {airportResultsTo.filter((airport) => airport.skyId.length < 4).map((airport) => (
                         <CommandItem
                             key={airport.skyId}
                             value={airport.presentation.title}

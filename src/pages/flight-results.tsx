@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
+import { ArrowRightLeft } from "lucide-react";
 
 import { useSearch } from "@/hooks/useSearch"
 import Header from "@/components/header"
@@ -11,13 +12,11 @@ import CalendarSelect from "@/components/calendar-select"
 import FilterSection from "@/components/filter-section"
 import SearchResults from "@/components/search-results"
 import { Button } from "@/components/ui/button";
-import { ArrowRightLeft } from "lucide-react";
 
 
 
 const FlightResults = () => {
-    const { direction, adults, kids, infants, cabinClass, dateFrom, dateTo, originSkyId, originEntityId, destinationSkyId, destinationEntityId, searchResults, setSearchResults } = useSearch()
-    const [loading, setLoading] = useState(false);
+    const { direction, adults, kids, infants, cabinClass, originSkyId, setOriginSkyId, originEntityId, setOriginEntityId, destinationSkyId, setDestinationSkyId, destinationEntityId, setDestinationEntityId, dateFrom, dateTo, searchResults, setSearchResults, originSearch, setOriginSearch, destinationSearch, setDestinationSearch, loading, setLoading } = useSearch();
 
     useEffect(() => {
         if (
@@ -81,34 +80,38 @@ const FlightResults = () => {
         originEntityId,
         destinationSkyId,
         destinationEntityId,
+        setLoading,
+        setSearchResults,
     ]);
 
-    console.log("RESULTS direction: ", direction)
-    console.log("RESULTS adults: ", adults)
-    console.log("RESULTS kids: ", kids)
-    console.log("RESULTS infants: ", infants)
-    console.log("RESULTS cabinClass: ", cabinClass)
-    console.log("RESULTS dateFrom: ", dateFrom)
-    console.log("RESULTS dateTo: ", dateTo)
-    console.log("RESULTS originSkyId: ", originSkyId)
-    console.log("RESULTS originEntityId: ", originEntityId)
-    console.log("RESULTS destinationSkyId: ", destinationSkyId)
-    console.log("RESULTS destinationEntityId: ", destinationEntityId)
+    const handleSwap = useCallback(() => {
+        const tempOrigin = originSearch;
+        const tempDestination = destinationSearch;
+        const tempOriginSkyId = originSkyId;
+        const tempOriginEntityId = originEntityId;
+        const tempDestinationSkyId = destinationSkyId;
+        const tempDestinationEntityId = destinationEntityId;
 
-    return (
-        <main>
-            <Header />
-            <div className="w-full md:max-w-screen-md lg:max-w-screen-lg mx-auto">
-                <div className="flex items-center gap-2 mt-2 px-2 md:px-0">
-                    <DirectionSelect />
-                    <PassengersSelect />
-                    <ClassSelect />
-                </div>
-                <div className="flex flex-col md:flex-row items-center justify-center gap-2 mt-2 px-4 md:px-0">
-                    <div className="relative w-full md:w-fit flex items-center gap-2">
-                        <OriginSelect commandWidth="w-full md:w-48 lg:w-78" commandHeight="h-12 md:h-14" />
-                        <Button
-                            className="
+        setOriginSearch(tempDestination);
+        setOriginSkyId(tempDestinationSkyId);
+        setOriginEntityId(tempDestinationEntityId);
+
+        setDestinationSearch(tempOrigin);
+        setDestinationSkyId(tempOriginSkyId);
+        setDestinationEntityId(tempOriginEntityId);
+    }, [originSearch, destinationSearch, originSkyId, originEntityId, destinationSkyId, destinationEntityId, setOriginSearch, setOriginSkyId, setOriginEntityId, setDestinationSearch, setDestinationSkyId, setDestinationEntityId]);
+
+    const selectComponents = useMemo(() => (
+        <>
+            <div className="flex items-center gap-2 mt-2 px-2 md:px-0">
+                <DirectionSelect />
+                <PassengersSelect />
+                <ClassSelect />
+            </div>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-2 mt-2 px-4 md:px-0">
+                <div className="relative w-full md:w-fit flex items-center gap-2">
+                    <OriginSelect commandWidth="w-full md:w-48 lg:w-78" commandHeight="h-12 md:h-14" />
+                    <Button onClick={handleSwap} className="
                         absolute 
                         left-1/2 
                         top-1/2     
@@ -123,23 +126,32 @@ const FlightResults = () => {
                         md:w-10 
                         rounded-full
                         bg-white"
-                        >
-                            <ArrowRightLeft size={20} />
-                        </Button>
-                        <DestinationSelect commandWidth="w-full md:w-48 lg:w-78" commandHeight="h-12 md:h-14" />
-                    </div>
-                    <CalendarSelect buttonWidth="w-full md:w-88 lg:w-93" buttonHeight="h-12 md:h-14" marginLeft="ml-0 md:ml-3" />
+                    >
+                        <ArrowRightLeft size={20} />
+                    </Button>
+                    <DestinationSelect commandWidth="w-full md:w-48 lg:w-78" commandHeight="h-12 md:h-14" />
                 </div>
-                <div className="w-full lg:max-w-screen-lg mx-auto  mt-2 px-4 md:px-0">
-                    <FilterSection />
-                </div>
-                {loading && "LOADING..."}
+                <CalendarSelect buttonWidth="w-full md:w-88 lg:w-93" buttonHeight="h-12 md:h-14" marginLeft="ml-0 md:ml-3" />
+            </div>
+            <div className="w-full lg:max-w-screen-lg mx-auto  mt-2 px-4 md:px-0">
+                <FilterSection />
+            </div>
+        </>
+    ), [
+        handleSwap
+    ]);
+
+    return (
+        <main>
+            <Header />
+            <div className="w-full md:max-w-screen-md lg:max-w-screen-lg mx-auto">
+                {selectComponents}
                 <div className="px-4 md:px-0">
                     {searchResults && !loading && <SearchResults />}
                 </div>
             </div>
         </main>
-    )
+    );
 }
 
 export default FlightResults

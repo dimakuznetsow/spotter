@@ -1,4 +1,5 @@
 import { createContext } from "react";
+import { SearchResults } from "@/lib/types";
 
 interface SearchContextProps {
   originSkyId: string;
@@ -23,12 +24,16 @@ interface SearchContextProps {
   setKids: (kids: number) => void;
   infants: number;
   setInfants: (infants: number) => void;
+  totalPassengers: number;
+  setTotalPassengers: (totalPassengers: number) => void;
   dateTo: Date | undefined;
   setDateTo: (date: Date | undefined) => void;
   dateFrom: Date | undefined;
   setDateFrom: (date: Date | undefined) => void;
-  searchResults: [];
-  setSearchResults: (results: []) => void;
+  searchResults: SearchResults | null;
+  setSearchResults: (results: SearchResults | null) => void;
+  loading: boolean;
+  setLoading: (loading: boolean) => void;
 }
 
 export const SearchContext = createContext<SearchContextProps | undefined>(

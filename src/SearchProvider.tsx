@@ -1,7 +1,7 @@
 import { useState, ReactNode } from "react";
+
+import { SearchResults } from "@/lib/types";
 import { SearchContext } from "./SearchContext";
-
-
 
 export const SearchProvider = ({ children }: { children: ReactNode }) => {
     const [originSkyId, setOriginSkyId] = useState("");
@@ -15,9 +15,11 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
     const [adults, setAdults] = useState(1);
     const [kids, setKids] = useState(0);
     const [infants, setInfants] = useState(0);
+    const [totalPassengers, setTotalPassengers] = useState(1);
     const [dateFrom, setDateFrom] = useState<Date | undefined>(new Date());
     const [dateTo, setDateTo] = useState<Date | undefined>();
-    const [searchResults, setSearchResults] = useState([]);
+    const [searchResults, setSearchResults] = useState<SearchResults | null>(null);
+    const [loading, setLoading] = useState(false);
 
     return (
         <SearchContext.Provider
@@ -44,12 +46,16 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
                 setKids,
                 infants,
                 setInfants,
+                totalPassengers,
+                setTotalPassengers,
                 dateFrom,
                 setDateFrom,
                 dateTo,
                 setDateTo,
                 searchResults,
-                setSearchResults
+                setSearchResults,
+                loading,
+                setLoading
             }}
         >
             {children}

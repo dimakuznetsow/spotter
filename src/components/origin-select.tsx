@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { Circle } from "lucide-react";
 
 import { useSearch } from "@/hooks/useSearch";
+import { APIResponse, FlightData } from "@/lib/types";
 import {
     Command,
     CommandGroup,
@@ -10,112 +11,66 @@ import {
     CommandList,
 } from "@/components/ui/command";
 
-interface Presentation {
-    title: string;
-    suggestionTitle: string;
-    subtitle: string;
-}
-
-interface RelevantFlightParams {
-    skyId: string;
-    entityId: string;
-    flightPlaceType: string;
-    localizedName: string;
-}
-
-interface RelevantHotelParams {
-    entityId: string;
-    entityType: string;
-    localizedName: string;
-}
-
-interface Navigation {
-    entityId: string;
-    entityType: "CITY" | "AIRPORT";
-    localizedName: string;
-    relevantFlightParams: RelevantFlightParams;
-    relevantHotelParams: RelevantHotelParams;
-}
-
-export interface FlightData {
-    skyId: string;
-    entityId: string;
-    presentation: Presentation;
-    navigation: Navigation;
-}
-
-interface APIResponse {
-    status: boolean;
-    timestamp: number;
-    data: FlightData[];
-}
-
 interface OriginSelectProps {
     commandWidth?: string;
     commandHeight?: string;
 }
 
 const OriginSelect: React.FC<OriginSelectProps> = ({ commandWidth, commandHeight }) => {
-    const { setOriginSkyId, setOriginEntityId, setOriginSearch, originSearch } = useSearch();
+    const { setOriginSkyId, setOriginEntityId, setOriginSearch, setLoading, originSearch } = useSearch();
 
     const [resultsFrom, setResultsFrom] = useState<FlightData[]>([]);
-    const [loading, setLoading] = useState(false);
 
-
-    console.log("ORIGIN SEARCH: ", originSearch);
-
-    useEffect(() => {
+    const fetchResults = useCallback(async () => {
         const controller = new AbortController();
         if (!originSearch) {
             setResultsFrom([]);
             return;
         }
 
-        const fetchResults = async () => {
-            setLoading(true);
-            try {
-                const response = await fetch(
-                    `https://sky-scrapper.p.rapidapi.com/api/v1/flights/searchAirport?query=${encodeURIComponent(
-                        originSearch
-                    )}&locale=en-US`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "X-RapidAPI-Key": import.meta.env.VITE_RAPID_API_KEY,
-                            "X-RapidAPI-Host": "sky-scrapper.p.rapidapi.com",
-                        },
-                        signal: controller.signal,
-                    }
-                );
-                const json: APIResponse = await response.json();
-                console.log("FETCHING RESULTS FROM: ", json.data, " DONE")
-                if (json && json.data) {
-                    setResultsFrom(json.data);
+        setLoading(true);
+        try {
+            const response = await fetch(
+                `https://sky-scrapper.p.rapidapi.com/api/v1/flights/searchAirport?query=${encodeURIComponent(
+                    originSearch
+                )}&locale=en-US`,
+                {
+                    method: "GET",
+                    headers: {
+                        "X-RapidAPI-Key": import.meta.env.VITE_RAPID_API_KEY,
+                        "X-RapidAPI-Host": "sky-scrapper.p.rapidapi.com",
+                    },
+                    signal: controller.signal,
                 }
-            } catch (error: unknown) {
-                if (error instanceof Error && error.name !== "AbortError") {
-
-                    console.error("Fetch error:", error);
-                }
-            } finally {
-                setLoading(false);
+            );
+            const json: APIResponse = await response.json();
+            console.log("FETCHING RESULTS FROM: ", json.data, " DONE");
+            if (json && json.data) {
+                setResultsFrom(json.data);
             }
-        };
+        } catch (error: unknown) {
+            if (error instanceof Error && error.name !== "AbortError") {
+                console.error("Fetch error:", error);
+            }
+        } finally {
+            setLoading(false);
+        }
+    }, [originSearch, setLoading, setResultsFrom]);
 
+    useEffect(() => {
         fetchResults();
+        return () => { };
+    }, [fetchResults]);
 
-        return () => controller.abort();
-    }, [originSearch]);
+    const cityResultsFrom = useMemo(() => {
+        return resultsFrom.filter(item => item.navigation.entityType === "CITY");
+    }, [resultsFrom]);
 
-
-    const cityResultsFrom = resultsFrom.filter(
-        (item) => item.navigation.entityType === "CITY"
-    );
-    const airportResultsFrom = resultsFrom.filter(
-        (item) => item.navigation.entityType === "AIRPORT"
-    );
-
-
+    const airportResultsFrom = useMemo(() => {
+        return resultsFrom.filter(
+            item => item.navigation.entityType === "AIRPORT"
+        );
+    }, [resultsFrom]);
     return (
         <Command className={`border ${commandWidth} ${commandHeight} border-gray-300 rounded-sm `}>
             <CommandInput
